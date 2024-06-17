@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - migrate
+
+  db:
+    image: nouchka/sqlite3
+    command: tail -f /dev/null
+    volumes:
+      - sqlite_db:/var/sqlite
+
+  migrate:
+    build: .
+    command: ["migrate", "-database", "sqlite3:///var/sqlite/lead_management.db", "-path", "/root/db/migrations", "up"]
+    depends_on:
+      - db
+    volumes:
+      - sqlite_db:/var/sqlite
+
+volumes:
+  sqlite_db:
