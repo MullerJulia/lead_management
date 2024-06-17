@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   app:
     build: .
@@ -16,8 +15,19 @@ services:
       - sqlite_db:/var/sqlite
 
   migrate:
-    build: .
-    command: ["migrate", "-database", "sqlite3:///var/sqlite/lead_management.db", "-path", "/root/db/migrations", "up"]
+    build:
+      context: .
+      args:
+        - http_proxy
+        - https_proxy
+    command: >
+          /bin/sh -c "apt-get update && apt-get install -y curl && \
+          /usr/bin/curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz -o migrate.tar.gz && \
+          file migrate.tar.gz | grep gzip && \
+          tar xz -f migrate.tar.gz && \
+          mv migrate /usr/local/bin/migrate && \
+          chmod +x /usr/local/bin/migrate && \
+          migrate -database 'sqlite3:///var/sqlite/lead_management.db' -path '/root/db/migrations' up"
     depends_on:
       - db
     volumes:
