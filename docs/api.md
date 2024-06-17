@@ -26,8 +26,7 @@ Request:
 }
 
 Example:
-curl -X POST http://localhost:8080/client/create -d 
-'{
+curl -X POST http://localhost:8080/client/create -d '{
   "name": "Test Client",
   "priority": 1,
   "leadCapacity": 100,
@@ -67,8 +66,7 @@ curl -X GET http://localhost:8080/client/1
 ### Create Multiple Clients
 
 Client A:
-curl -X POST http://localhost:8080/client/create -d 
-'{
+curl -X POST http://localhost:8080/client/create -d '{
   "name": "Client A",
   "priority": 2,
   "leadCapacity": 50,
@@ -78,8 +76,7 @@ curl -X POST http://localhost:8080/client/create -d
 }' -H "Content-Type: application/json"
 
 Client B:
-curl -X POST http://localhost:8080/client/create -d 
-'{
+curl -X POST http://localhost:8080/client/create -d '{
   "name": "Client B",
   "priority": 3,
   "leadCapacity": 75,
@@ -89,8 +86,7 @@ curl -X POST http://localhost:8080/client/create -d
 }' -H "Content-Type: application/json"
 
 Client C:
-curl -X POST http://localhost:8080/client/create -d 
-'{
+curl -X POST http://localhost:8080/client/create -d '{
   "name": "Client C",
   "priority": 1,
   "leadCapacity": 200,
