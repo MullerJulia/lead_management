@@ -19,12 +19,17 @@ COPY . .
 # Build the Go app with CGO enabled
 RUN CGO_ENABLED=1 GOOS=linux go build -o main ./cmd
 
-# Install wget
+# Install wget and other required packages
 RUN apt-get update && apt-get install -y wget
 
 # Download and install migrate
 RUN wget -q -O migrate.tar.gz https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz && \
     tar -xzf migrate.tar.gz && \
-    ls -la && \
     mv migrate /usr/local/bin/migrate && \
     rm migrate.tar.gz
+
+# Verify installation of migrate
+RUN migrate -version
+
+# Set the entrypoint to the main binary
+ENTRYPOINT ["/app/main"]
