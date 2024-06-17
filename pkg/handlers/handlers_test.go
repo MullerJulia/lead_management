@@ -24,8 +24,15 @@ func TestCreateClientHandler(t *testing.T) {
 	}
 
 	// Test data
-	client := models.Client{Name: "New Client", Priority: 5, LeadCapacity: 10}
-	clientBody, _ := json.Marshal(client)
+	clientReq := CreateClientRequest{
+		Name:              "New Client",
+		Priority:          5,
+		LeadCapacity:      10,
+		CurrentLeadCount:  0,
+		WorkingHoursStart: "09:00",
+		WorkingHoursEnd:   "17:00",
+	}
+	clientBody, _ := json.Marshal(clientReq)
 	invalidBody := []byte("{invalid json}")
 
 	tests := []testCase{
@@ -53,9 +60,15 @@ func TestCreateClientHandler(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			database := db.InitDB(":memory:")
 			defer database.Close()
+
 			handler := CreateClientHandler(database)
 
-			req, _ := http.NewRequest(tc.method, "/client/create", bytes.NewReader(tc.body))
+			req, err := http.NewRequest(tc.method, "/client/create", bytes.NewReader(tc.body))
+			if err != nil {
+				t.Fatalf("Could not create request: %v", err)
+			}
+			req.Header.Set("Content-Type", "application/json")
+
 			rr := httptest.NewRecorder()
 			handler.ServeHTTP(rr, req)
 
@@ -63,11 +76,15 @@ func TestCreateClientHandler(t *testing.T) {
 
 			if tc.expectedCode == http.StatusCreated {
 				var responseClient models.Client
-				if err := json.Unmarshal(rr.Body.Bytes(), &responseClient); err != nil {
-					t.Fatal("Could not parse response:", err)
+				err := json.NewDecoder(rr.Body).Decode(&responseClient)
+				if err != nil {
+					t.Fatalf("Could not parse response: %v", err)
 				}
-				assert.Equal(t, "New Client", responseClient.Name)
+				assert.Equal(t, clientReq.Name, responseClient.Name)
 				assert.NotEmpty(t, responseClient.ID)
+			} else {
+				// Debugging output for non-201 responses
+				t.Logf("Response body: %s", rr.Body.String())
 			}
 		})
 	}
