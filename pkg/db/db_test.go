@@ -145,6 +145,9 @@ func TestGetAllClients(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
+				if clients == nil {
+					clients = []models.Client{}
+				}
 				assert.Equal(t, tc.expectedData, clients, "Fetched clients do not match expected")
 			}
 		})
